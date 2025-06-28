@@ -159,87 +159,21 @@ if [ -f "/opt/houer-installer/LOGO.png" ]; then
     cp /opt/houer-installer/LOGO.png /etc/calamares/branding/houer/logo.png
 fi
 
-# Configure packages to be installed by Calamares
-log "Configuring base packages for Calamares..."
+# Configure essential system packages only for Calamares
+log "Configuring essential system packages for Calamares..."
 cat > /etc/calamares/modules/packages.conf << 'EOF'
 backend: pacman
 
 operations:
   - install:
+    # Essential system packages only
     - base-devel
     - linux-headers
     - networkmanager
-    - bluetooth
-    - bluez-utils
-    - cups
-    # Essential desktop applications
-    - firefox
-    - nautilus
-    - gedit
-    - gnome-calculator
-    - gnome-terminal
-    - gnome-system-monitor
-    - gnome-screenshot
-    - evince
-    - file-roller
-    # KDE applications
-    - konsole
-    - dolphin
-    - kate
-    - ark
-    - spectacle
-    - kcalc
-    - okular
-    # System tools
     - git
+    - nano
     - wget
     - curl
-    - nano
-    - vim
-    - htop
-    - neofetch
-    - gvfs
-    - gvfs-mtp
-    # Graphics and display
-    - xorg-server
-    - xorg-xinit
-    - xorg-xrandr
-    - mesa
-    # Fonts
-    - ttf-dejavu
-    - ttf-liberation
-    - noto-fonts
-    - noto-fonts-emoji
-    # Audio
-    - alsa-utils
-    # Wine for Windows app support
-    - wine
-    - winetricks
-    # Development tools
-    - python-pip
-    - python-setuptools
-    - python-wheel
-
-# Detect and add graphics drivers
-echo "# Graphics drivers (auto-detected)" >> /etc/calamares/modules/packages.conf
-if lspci | grep -i nvidia > /dev/null; then
-    log "NVIDIA graphics detected, adding NVIDIA drivers to package list..."
-    cat >> /etc/calamares/modules/packages.conf << 'EOF'
-    # NVIDIA Graphics
-    - nvidia
-    - nvidia-utils
-    - nvidia-settings
-EOF
-fi
-
-if lspci | grep -i amd > /dev/null; then
-    log "AMD graphics detected, adding AMD drivers to package list..."
-    cat >> /etc/calamares/modules/packages.conf << 'EOF'
-    # AMD Graphics  
-    - xf86-video-amdgpu
-    - vulkan-radeon
-EOF
-fi
 EOF
 
 # Update Calamares settings to include packages module

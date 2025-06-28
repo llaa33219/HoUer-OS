@@ -39,11 +39,103 @@ info() {
 }
 
 log "Starting HoUer OS post-installation configuration..."
-log "Installing HoUer OS specific components..."
 
 # Update package database
 log "Updating package database..."
 pacman -Sy
+
+# Step 1: Install basic desktop applications
+log "Step 1: Installing basic desktop applications..."
+
+# Essential desktop applications
+log "Installing essential desktop applications..."
+pacman -S --needed --noconfirm \
+    firefox \
+    nautilus \
+    gedit \
+    gnome-calculator \
+    gnome-terminal \
+    gnome-system-monitor \
+    gnome-screenshot \
+    evince \
+    file-roller
+
+# KDE applications
+log "Installing KDE applications..."
+pacman -S --needed --noconfirm \
+    konsole \
+    dolphin \
+    kate \
+    ark \
+    spectacle \
+    kcalc \
+    okular
+
+# System tools
+log "Installing system tools..."
+pacman -S --needed --noconfirm \
+    vim \
+    htop \
+    neofetch \
+    gvfs \
+    gvfs-mtp
+
+# Graphics and display
+log "Installing graphics and display support..."
+pacman -S --needed --noconfirm \
+    xorg-server \
+    xorg-xinit \
+    xorg-xrandr \
+    mesa
+
+# Fonts
+log "Installing fonts..."
+pacman -S --needed --noconfirm \
+    ttf-dejavu \
+    ttf-liberation \
+    noto-fonts \
+    noto-fonts-emoji
+
+# Audio and hardware support
+log "Installing audio and hardware support..."
+pacman -S --needed --noconfirm \
+    alsa-utils \
+    bluetooth \
+    bluez-utils \
+    cups
+
+# Wine for Windows app support
+log "Installing Wine for Windows application support..."
+pacman -S --needed --noconfirm \
+    wine \
+    winetricks
+
+# Development tools
+log "Installing development tools..."
+pacman -S --needed --noconfirm \
+    python-pip \
+    python-setuptools \
+    python-wheel
+
+# Install graphics drivers
+log "Step 2: Installing graphics drivers..."
+if lspci | grep -i nvidia > /dev/null; then
+    log "NVIDIA graphics detected, installing NVIDIA drivers..."
+    pacman -S --needed --noconfirm \
+        nvidia \
+        nvidia-utils \
+        nvidia-settings || warning "Failed to install NVIDIA drivers"
+fi
+
+if lspci | grep -i amd > /dev/null; then
+    log "AMD graphics detected, installing AMD drivers..."
+    pacman -S --needed --noconfirm \
+        xf86-video-amdgpu \
+        vulkan-radeon || warning "Failed to install AMD drivers"
+fi
+
+# Step 3: Install HoUer OS specific components
+log "Step 3: Installing HoUer OS specific components..."
 
 # Install Enlightenment Desktop Environment (HoUer OS default DE)
 log "Installing Enlightenment Desktop Environment..."
