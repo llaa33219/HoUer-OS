@@ -44,98 +44,45 @@ log "Starting HoUer OS post-installation configuration..."
 log "Updating package database..."
 pacman -Sy
 
-# Step 1: Install basic desktop applications
-log "Step 1: Installing basic desktop applications..."
-
-# Essential desktop applications
-log "Installing essential desktop applications..."
+# Step 1: Install essential system packages first (that Calamares didn't install)
+log "Step 1: Installing essential system packages..."
 pacman -S --needed --noconfirm \
-    firefox \
-    nautilus \
-    gedit \
-    gnome-calculator \
-    gnome-terminal \
-    gnome-system-monitor \
-    gnome-screenshot \
-    evince \
-    file-roller
+    base-devel \
+    linux-headers \
+    networkmanager \
+    git \
+    nano \
+    wget \
+    curl
 
-# KDE applications
-log "Installing KDE applications..."
-pacman -S --needed --noconfirm \
-    konsole \
-    dolphin \
-    kate \
-    ark \
-    spectacle \
-    kcalc \
-    okular
+# Enable NetworkManager for next boot
+log "Enabling NetworkManager..."
+systemctl enable NetworkManager
 
-# System tools
-log "Installing system tools..."
-pacman -S --needed --noconfirm \
-    vim \
-    htop \
-    neofetch \
-    gvfs \
-    gvfs-mtp
+# Step 2: Install minimal system components
+log "Step 2: Installing minimal system components..."
 
-# Graphics and display
-log "Installing graphics and display support..."
+# Minimal X11/Wayland support for Enlightenment
+log "Installing minimal display server support..."
 pacman -S --needed --noconfirm \
     xorg-server \
-    xorg-xinit \
-    xorg-xrandr \
     mesa
 
-# Fonts
-log "Installing fonts..."
+# Basic audio (for system notifications)
+log "Installing basic audio support..."
 pacman -S --needed --noconfirm \
-    ttf-dejavu \
-    ttf-liberation \
-    noto-fonts \
-    noto-fonts-emoji
+    alsa-utils
 
-# Audio and hardware support
-log "Installing audio and hardware support..."
+# Note: Fonts will be installed with Korean CJK fonts later
+
+# Essential Python for HoUer Manager
+log "Installing Python for HoUer Manager..."
 pacman -S --needed --noconfirm \
-    alsa-utils \
-    bluetooth \
-    bluez-utils \
-    cups
+    python \
+    python-tk
 
-# Wine for Windows app support
-log "Installing Wine for Windows application support..."
-pacman -S --needed --noconfirm \
-    wine \
-    winetricks
-
-# Development tools
-log "Installing development tools..."
-pacman -S --needed --noconfirm \
-    python-pip \
-    python-setuptools \
-    python-wheel
-
-# Install graphics drivers
-log "Step 2: Installing graphics drivers..."
-if lspci | grep -i nvidia > /dev/null; then
-    log "NVIDIA graphics detected, installing NVIDIA drivers..."
-    pacman -S --needed --noconfirm \
-        nvidia \
-        nvidia-utils \
-        nvidia-settings || warning "Failed to install NVIDIA drivers"
-fi
-
-if lspci | grep -i amd > /dev/null; then
-    log "AMD graphics detected, installing AMD drivers..."
-    pacman -S --needed --noconfirm \
-        xf86-video-amdgpu \
-        vulkan-radeon || warning "Failed to install AMD drivers"
-fi
-
-# Step 3: Install HoUer OS specific components
-log "Step 3: Installing HoUer OS specific components..."
+# Step 3: Install HoUer OS core components
+log "Step 3: Installing HoUer OS core components..."
 
 # Install Enlightenment Desktop Environment (HoUer OS default DE)
 log "Installing Enlightenment Desktop Environment..."
@@ -156,12 +103,6 @@ pacman -S --needed --noconfirm \
 log "Adding Flathub repository..."
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# Install Python for HoUer Manager
-log "Installing Python for HoUer Manager..."
-pacman -S --needed --noconfirm \
-    python \
-    python-tk
-
 # Install Korean input method (for HoUer OS)
 log "Installing Korean input method..."
 pacman -S --needed --noconfirm \
@@ -174,14 +115,7 @@ pacman -S --needed --noconfirm \
     wayland \
     xwayland
 
-# Install audio system
-log "Installing audio system..."
-pacman -S --needed --noconfirm \
-    pulseaudio \
-    pulseaudio-alsa \
-    pavucontrol
-
-# Install Korean fonts
+# Install Korean fonts (CJK includes basic fonts)
 log "Installing Korean fonts..."
 pacman -S --needed --noconfirm \
     noto-fonts-cjk
@@ -189,7 +123,6 @@ pacman -S --needed --noconfirm \
 # Enable essential services
 log "Enabling essential services..."
 systemctl enable NetworkManager || warning "NetworkManager already enabled or not found"
-systemctl enable bluetooth || warning "Bluetooth service not found"
 
 # Copy HoUer Manager
 log "Installing HoUer Manager..."

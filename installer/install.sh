@@ -159,30 +159,14 @@ if [ -f "/opt/houer-installer/LOGO.png" ]; then
     cp /opt/houer-installer/LOGO.png /etc/calamares/branding/houer/logo.png
 fi
 
-# Configure essential system packages only for Calamares
-log "Configuring essential system packages for Calamares..."
-cat > /etc/calamares/modules/packages.conf << 'EOF'
-backend: pacman
+# Note: No additional packages during Calamares installation
+# All packages will be installed after first boot by post-install script
+log "Calamares will install base system only. Packages will be installed after reboot."
 
-operations:
-  - install:
-    # Essential system packages only
-    - base-devel
-    - linux-headers
-    - networkmanager
-    - git
-    - nano
-    - wget
-    - curl
-EOF
-
-# Update Calamares settings to include packages module
+# Create Calamares settings for base system installation only
 cat > /etc/calamares/settings.conf << 'EOF'
 modules-search: [ local ]
 instances:
-- id: before
-  module: shellprocess
-  config: shellprocess_before.conf
 - id: after  
   module: shellprocess
   config: shellprocess_after.conf
@@ -209,8 +193,6 @@ sequence:
   - networkcfg
   - hwclock
   - services-systemd
-  - packages
-  - shellprocess@before
   - bootloader
   - shellprocess@after
   - umount

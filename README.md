@@ -17,7 +17,7 @@ HoUer OS는 컨테이너 중심으로 동작하며 Enlightenment를 기본 DE로
 ### 전제 조건
 - 아치리눅스 라이브 환경 (USB 또는 CD/DVD 부팅)
 - 인터넷 연결
-- 충분한 디스크 공간 (최소 8GB, 권장 16GB)
+- 충분한 디스크 공간 (최소 4GB, 권장 8GB)
 
 ### 설치 방법
 
@@ -41,23 +41,42 @@ chmod +x installer/install.sh
 sudo ./installer/install.sh
 ```
 
-4. **Calamares 설치 마법사**:
+4. **Calamares 설치 마법사 진행**:
    - 스크립트가 자동으로 Calamares 실행
-   - 일반적인 Linux 설치 과정 진행:
+   - 일반적인 Linux 설치 과정만 진행:
      - 언어 선택
      - 키보드 레이아웃
      - 파티션 설정
      - 사용자 계정 생성
-     - 설치 진행
+     - **설치 클릭** → 모든 것이 자동으로 완료됨
 
-5. **설치 완료**:
-   - 재부팅 후 HoUer OS 사용
+5. **자동 설치 완료**:
+   - Calamares가 자동으로 HoUer OS 모든 구성요소 설치
+   - 재부팅하면 HoUer OS 사용 준비 완료
    - `houer-manager` 명령어로 컨테이너 관리자 실행
 
 **📋 설치 과정 요약:**
 - **준비 스크립트**: 라이브 환경에서 Calamares 설치 도구 준비
-- **Calamares**: 실제 OS 설치 (파티션, 부트로더, 기본 애플리케이션들)
-- **Post-install**: HoUer OS만의 특별한 구성요소 설치 (Enlightenment, 컨테이너 도구, HoUer Manager)
+- **Calamares 1단계**: Arch Linux 기본 시스템 설치 (base, kernel, bootloader, 사용자 계정)
+- **Calamares 2단계**: 자동으로 HoUer OS 구성요소 설치 (post-install 스크립트 실행)
+- **완료**: 재부팅하면 HoUer OS 사용 준비 완료
+
+**🚀 설치 과정 (모두 자동):**
+
+**Calamares 설치 중 자동으로 진행:**
+1. 기본 시스템 설치 (base, linux, bootloader)
+2. HoUer OS 구성요소 자동 설치:
+   - base-devel, networkmanager, git
+   - Enlightenment 데스크톱 환경
+   - 컨테이너 도구 (podman, distrobox, flatpak)
+   - HoUer Manager (Python 기반)
+   - 한국어 입력기 및 폰트
+   - 최소 오디오/디스플레이 지원
+
+**사용자 작업:** Calamares 설치 마법사만 진행 → 자동으로 모든 설정 완료
+
+**📦 애플리케이션은 컨테이너로:**
+Firefox, 개발도구, 멀티미디어 앱 등은 컨테이너로 설치하여 시스템을 깔끔하게 유지
 
 ## HoUer Manager
 
@@ -132,80 +151,99 @@ python3 /opt/houer-manager/houer-manager.py
 
 ### 최소 사양
 - CPU: x86_64 아키텍처
-- RAM: 2GB (4GB 권장)
-- 저장공간: 8GB (컨테이너용 추가 공간 필요)
+- RAM: 1GB (2GB 권장)
+- 저장공간: 4GB (컨테이너용 추가 공간 필요)
 - 그래픽: 통합 그래픽 또는 전용 그래픽카드
 
 ### 권장 사양
 - CPU: 멀티코어 프로세서
-- RAM: 8GB 이상
-- 저장공간: SSD 20GB 이상
+- RAM: 4GB 이상 (컨테이너 다중 실행용)
+- 저장공간: SSD 16GB 이상
 - 그래픽: NVIDIA 또는 AMD 전용 그래픽카드
 
-**💡 효율적인 설치**: HoUer OS는 Calamares가 기본 데스크톱 애플리케이션을 설치하고, post-install에서 HoUer OS만의 특별한 구성요소를 추가합니다.
+**💡 컨테이너 중심 설계**: HoUer OS는 최소한의 시스템만 설치하고, 애플리케이션들은 컨테이너로 실행합니다. 이를 통해 공간을 절약하고 안전하게 앱을 격리할 수 있습니다.
 
-## 추가 패키지 설치
+## 컨테이너로 애플리케이션 실행
 
-HoUer OS는 기본적인 데스크톱 환경과 필수 애플리케이션을 포함합니다. 필요에 따라 추가 패키지를 설치할 수 있습니다:
+HoUer OS는 컨테이너 중심 설계로 애플리케이션들을 격리된 환경에서 실행합니다. 다음은 주요 애플리케이션들을 컨테이너로 실행하는 방법입니다:
 
-### AUR 헬퍼 설치 (추가 패키지용)
+### 웹 브라우저 (Firefox)
 ```bash
-# yay 설치 (AUR 패키지 관리용)
-cd /tmp
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si --noconfirm
+# Flatpak으로 설치 (권장)
+flatpak install flathub org.mozilla.firefox
+
+# 또는 Ubuntu 컨테이너에서 실행
+distrobox create --name ubuntu-apps --image ubuntu:latest
+distrobox enter ubuntu-apps
+sudo apt update && sudo apt install firefox
 ```
 
-### Windows 컨테이너 지원 (soda)
+### 개발 환경
 ```bash
-# yay 설치 후
-yay -S --noconfirm soda-git
+# Ubuntu 개발 컨테이너 생성
+distrobox create --name dev-ubuntu --image ubuntu:latest
+distrobox enter dev-ubuntu
+sudo apt update && sudo apt install git nodejs npm python3 code
+
+# Fedora 개발 컨테이너 생성  
+distrobox create --name dev-fedora --image fedora:latest
+distrobox enter dev-fedora
+sudo dnf install git nodejs npm python3 code
 ```
 
-### 추가 개발 도구
+### 멀티미디어 애플리케이션
 ```bash
-# 고급 개발 도구들 (기본 Python 개발 환경은 이미 설치됨)
-sudo pacman -S nodejs npm rust cargo go code
+# GIMP, VLC 등을 Flatpak으로
+flatpak install flathub org.gimp.GIMP
+flatpak install flathub org.videolan.VLC
+flatpak install flathub org.audacityteam.Audacity
 
-# 컨테이너 도구들
-sudo pacman -S docker docker-compose
-
-# 추가 Python 도구들
-sudo pacman -S python-virtualenv
+# 또는 컨테이너에서
+distrobox create --name multimedia --image ubuntu:latest
+distrobox enter multimedia
+sudo apt install gimp vlc audacity
 ```
 
-### 추가 멀티미디어 애플리케이션
+### 오피스 애플리케이션
 ```bash
-# 멀티미디어 (기본 Firefox, 파일 관리자 등은 이미 설치됨)
-sudo pacman -S vlc gimp inkscape audacity
+# LibreOffice를 Flatpak으로 설치
+flatpak install flathub org.libreoffice.LibreOffice
 
-# 오피스
-sudo pacman -S libreoffice-fresh
-
-# 그래픽 도구
-sudo pacman -S blender krita
+# 또는 컨테이너에서
+distrobox enter ubuntu-apps
+sudo apt install libreoffice
 ```
 
-### 추가 시스템 도구
+### 게임 및 엔터테인먼트
 ```bash
-# 시스템 관리 (기본 도구들은 이미 설치됨)
-sudo pacman -S gparted wireshark-qt
+# Steam을 Flatpak으로
+flatpak install flathub com.valvesoftware.Steam
 
-# 네트워크 도구
-sudo pacman -S nmap tcpdump
+# Discord
+flatpak install flathub com.discordapp.Discord
 ```
 
-### 추가 입력 방법
+### Windows 애플리케이션 (soda 필요시)
 ```bash
-# 중국어 입력기 (한국어는 HoUer OS에서 기본 설치됨)
-sudo pacman -S ibus-libpinyin
+# 먼저 AUR 헬퍼 설치
+cd /tmp && git clone https://aur.archlinux.org/yay.git
+cd yay && makepkg -si --noconfirm
 
-# 일본어 입력기
-sudo pacman -S ibus-anthy
+# soda 설치 (Windows 컨테이너)
+yay -S soda-git
 
-# 베트남어 입력기
-sudo pacman -S ibus-unikey
+# Windows 애플리케이션 실행
+soda run notepad.exe
+```
+
+### 직접 패키지 설치 (필요시)
+시스템에 직접 설치가 필요한 경우:
+```bash
+# 시스템 도구들
+sudo pacman -S htop neofetch gparted
+
+# 입력기 추가
+sudo pacman -S ibus-libpinyin ibus-anthy
 ```
 
 ## 기본 설정
