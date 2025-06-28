@@ -1,0 +1,14 @@
+# HoUer OS Requirements
+# Python packages required for HoUer Manager
+
+# GUI framework (usually included with Python)
+# tkinter - built-in on most Python installations
+
+# Optional for icon creation
+Pillow>=9.0.0
+
+# System dependencies (install via package manager):
+# - distrobox
+# - podman
+# - python3-tk (on some distributions)
+# - soda (from AUR for Windows container support) 

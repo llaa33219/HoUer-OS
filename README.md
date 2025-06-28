@@ -1,0 +1,183 @@
+# HoUer OS
+
+HoUer OS는 컨테이너 중심으로 동작하며 Enlightenment를 기본 DE로 사용하는 아치리눅스 기반 운영체제입니다.
+
+![HoUer OS Logo](LOGO.png)
+
+## 주요 특징
+
+- **컨테이너 중심 아키텍처**: distrobox와 soda를 활용한 효율적인 애플리케이션 격리
+- **Enlightenment DE**: 가벼우면서도 아름다운 데스크톱 환경
+- **통합 컨테이너 관리**: HoUer Manager를 통한 직관적인 컨테이너 관리
+- **크로스 플랫폼 지원**: Linux 및 Windows 애플리케이션 모두 지원
+- **Wayland 우선**: 최신 디스플레이 서버 기술 지원
+
+## 설치
+
+### 전제 조건
+- 순정 아치리눅스 시스템
+- 인터넷 연결
+- 충분한 디스크 공간 (최소 20GB 권장)
+
+### 설치 방법
+
+1. 저장소 클론:
+```bash
+git clone https://github.com/your-repo/houer-os.git
+cd houer-os
+```
+
+2. 설치 스크립트 실행:
+```bash
+chmod +x installer/install.sh
+./installer/install.sh
+```
+
+3. 설치 스크립트가 필요한 패키지들을 자동으로 설치하고 Calamares 설치 화면을 실행합니다.
+
+4. Calamares를 통해 설치를 완료합니다.
+
+## HoUer Manager
+
+HoUer Manager는 HoUer OS의 핵심 컴포넌트로, 컨테이너 관리를 위한 GUI 애플리케이션입니다.
+
+### 주요 기능
+
+- **Linux 컨테이너 관리**: distrobox 기반 Linux 배포판 컨테이너
+- **Windows 컨테이너 지원**: soda를 통한 Windows 애플리케이션 실행
+- **애플리케이션 바로가기**: 컨테이너 애플리케이션의 데스크톱 바로가기 생성
+- **ISO 설치**: ISO 파일에서 직접 컨테이너 생성
+- **설정 관리**: 컨테이너별 개별 설정 관리
+
+### 실행 방법
+
+설치 후 다음 방법들로 HoUer Manager를 실행할 수 있습니다:
+
+```bash
+# 1. 명령어로 실행 (권장)
+houer-manager
+
+# 2. 짧은 명령어
+houer
+
+# 3. 옵션과 함께 실행
+houer-manager --debug          # 디버그 모드
+houer-manager --minimized      # 최소화 상태로 시작
+houer-manager --help           # 도움말 표시
+houer-manager --version        # 버전 정보
+
+# 4. 직접 Python 실행
+python3 /opt/houer-manager/houer-manager.py
+
+# 5. 데스크톱에서 "HoUer Manager" 애플리케이션 실행
+```
+
+### 개발 환경에서 실행
+
+```bash
+# 개발 디렉토리에서
+./Manager/houer-manager
+
+# 또는 테스트 스크립트 실행
+chmod +x test-houer-manager.sh
+./test-houer-manager.sh
+```
+
+## 지원 배포판
+
+### Linux 컨테이너
+- Ubuntu (latest)
+- Fedora (latest)
+- Debian (latest)
+- Arch Linux (latest)
+- Alpine (latest)
+- openSUSE Tumbleweed
+- CentOS Stream 9
+
+### Windows 컨테이너
+- Windows 10
+- Windows 11
+
+## 시스템 요구사항
+
+### 최소 사양
+- CPU: x86_64 아키텍처
+- RAM: 4GB (8GB 권장)
+- 저장공간: 20GB (컨테이너용 추가 공간 필요)
+- 그래픽: 통합 그래픽 또는 전용 그래픽카드
+
+### 권장 사양
+- CPU: 멀티코어 프로세서
+- RAM: 8GB 이상
+- 저장공간: SSD 50GB 이상
+- 그래픽: NVIDIA 또는 AMD 전용 그래픽카드
+
+## 기본 설정
+
+### 디스플레이 서버
+- 기본: Wayland
+- 대체: X11 (호환성을 위해 설치됨)
+
+### 그래픽 드라이버
+- NVIDIA: 자동 감지 및 설치
+- AMD: 오픈소스 드라이버 사용
+- Intel: 통합 그래픽 지원
+
+### 입력 방법
+- ibus 기반 다국어 입력 지원
+- 한글, 중국어, 일본어, 베트남어 입력기 포함
+
+## 개발
+
+### 프로젝트 구조
+```
+HoUer OS/
+├── installer/          # 설치 스크립트
+│   └── install.sh
+├── Manager/            # HoUer Manager 소스코드
+│   ├── core/          # 핵심 로직
+│   ├── gui/           # GUI 컴포넌트
+│   └── assets/        # 리소스 파일
+├── docs/              # 문서
+└── assets/            # 프로젝트 리소스
+```
+
+### 개발 환경 설정
+
+1. 의존성 설치:
+```bash
+pip install -r requirements.txt
+sudo pacman -S distrobox podman python-tk
+```
+
+2. HoUer Manager 개발 실행:
+```bash
+cd Manager
+python3 houer-manager.py
+```
+
+## 기여하기
+
+1. 이 저장소를 포크하세요
+2. 새로운 기능 브랜치를 만드세요 (`git checkout -b feature/AmazingFeature`)
+3. 변경사항을 커밋하세요 (`git commit -m 'Add some AmazingFeature'`)
+4. 브랜치에 푸시하세요 (`git push origin feature/AmazingFeature`)
+5. Pull Request를 열어주세요
+
+## 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
+
+## 지원
+
+- **이슈**: GitHub Issues를 통해 버그 리포트 및 기능 요청
+- **토론**: GitHub Discussions에서 커뮤니티와 소통
+- **문서**: `docs/` 폴더의 추가 문서 참조
+
+## 감사의 말
+
+- [Arch Linux](https://archlinux.org/) - 기반 배포판
+- [Enlightenment](https://www.enlightenment.org/) - 데스크톱 환경
+- [distrobox](https://github.com/89luca89/distrobox) - Linux 컨테이너 관리
+- [Podman](https://podman.io/) - 컨테이너 런타임
+- [Calamares](https://calamares.io/) - 설치 프레임워크 

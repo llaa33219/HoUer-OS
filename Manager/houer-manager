@@ -1,0 +1,18 @@
+#!/bin/bash
+# HoUer Manager Launcher Script
+
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Check if we're running from the development directory
+if [[ -f "$SCRIPT_DIR/houer-manager.py" ]]; then
+    # Development mode
+    exec python3 "$SCRIPT_DIR/houer-manager.py" "$@"
+elif [[ -f "/opt/houer-manager/houer-manager.py" ]]; then
+    # Installed mode
+    exec python3 "/opt/houer-manager/houer-manager.py" "$@"
+else
+    echo "Error: HoUer Manager not found!"
+    echo "Please install HoUer OS or run from the development directory."
+    exit 1
+fi 
