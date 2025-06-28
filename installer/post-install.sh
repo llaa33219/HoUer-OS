@@ -57,46 +57,41 @@ pacman -S --needed --noconfirm \
     docker \
     docker-compose
 
-# Install development tools
-log "Installing development tools..."
+# Install Python and essential development tools
+log "Installing Python and essential development tools..."
 pacman -S --needed --noconfirm \
     python \
     python-pip \
     python-setuptools \
-    python-wheel \
-    python-tk \
-    nodejs \
-    npm \
-    rust \
-    cargo \
-    go
+    python-tk
 
 # Install flatpak
 log "Installing Flatpak..."
 pacman -S --needed --noconfirm flatpak
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# Install GNOME basic applications
-log "Installing GNOME applications..."
+# Install essential GNOME applications
+log "Installing essential GNOME applications..."
 pacman -S --needed --noconfirm \
-    gnome-calculator \
-    gnome-system-monitor \
-    gnome-disk-utility \
-    gnome-screenshot \
     nautilus \
     gedit \
-    evince
+    gnome-calculator \
+    gnome-terminal \
+    gnome-system-monitor \
+    gnome-screenshot \
+    evince \
+    firefox
 
-# Install KDE basic applications
-log "Installing KDE applications..."
+# Install essential KDE applications
+log "Installing essential KDE applications..."
 pacman -S --needed --noconfirm \
     konsole \
     dolphin \
     kate \
-    okular \
+    ark \
     spectacle \
     kcalc \
-    ark
+    okular
 
 # Install input methods
 log "Installing input methods..."
@@ -104,8 +99,7 @@ pacman -S --needed --noconfirm \
     ibus \
     ibus-hangul \
     ibus-libpinyin \
-    ibus-anthy \
-    ibus-unikey
+    ibus-anthy
 
 # Install graphics drivers
 log "Detecting graphics card..."
@@ -160,8 +154,8 @@ pacman -S --needed --noconfirm \
     winetricks \
     lib32-gnutls
 
-# Install additional useful packages
-log "Installing additional packages..."
+# Install essential system tools
+log "Installing essential system tools..."
 pacman -S --needed --noconfirm \
     base-devel \
     git \
@@ -171,11 +165,9 @@ pacman -S --needed --noconfirm \
     vim \
     htop \
     neofetch \
-    firefox \
     file-roller \
     gvfs \
-    gvfs-mtp \
-    gvfs-gphoto2
+    gvfs-mtp
 
 # Enable services
 log "Enabling system services..."
@@ -201,9 +193,9 @@ if [ -n "$REGULAR_USER" ]; then
     rm -rf yay
 EOFYAY
 
-    # Install soda for Windows container support
-    log "Installing soda for Windows container support..."
-    sudo -u "$REGULAR_USER" yay -S --noconfirm soda-git || warning "Failed to install soda from AUR"
+    # Note: soda can be installed later if needed for Windows containers
+    log "Note: Install soda later if needed for Windows container support:"
+    info "  yay -S soda-git"
 else
     warning "No regular user found, skipping AUR helper installation"
 fi
