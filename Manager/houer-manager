@@ -1,18 +1,12 @@
-#!/bin/bash
-# HoUer Manager Launcher Script
+#!/usr/bin/env python3
 
-# Get the directory of this script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+import sys
+import os
 
-# Check if we're running from the development directory
-if [[ -f "$SCRIPT_DIR/houer-manager.py" ]]; then
-    # Development mode
-    exec python3 "$SCRIPT_DIR/houer-manager.py" "$@"
-elif [[ -f "/opt/houer-manager/houer-manager.py" ]]; then
-    # Installed mode
-    exec python3 "/opt/houer-manager/houer-manager.py" "$@"
-else
-    echo "Error: HoUer Manager not found!"
-    echo "Please install HoUer OS or run from the development directory."
-    exit 1
-fi 
+# Add the script's directory to the Python path to find the houer_manager module
+sys.path.insert(0, os.path.dirname(__file__))
+
+from houer_manager.main import main
+
+if __name__ == "__main__":
+    main() 
