@@ -2,7 +2,10 @@
 
 # HoUer OS Post-Installation Script
 # This script is executed by Calamares after the base system installation
-# It installs and configures all HoUer OS specific components
+# It installs and configures ONLY HoUer OS specific components
+# 
+# Note: Basic system (base, base-devel, kernel, bootloader, users) 
+#       should already be installed by Calamares
 
 set -e
 
@@ -15,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Logging function
 log() {
-    echo -e "${GREEN}[HoUer OS Post-Install]${NC} $1"
+    echo -e "${GREEN}[HoUer OS]${NC} $1"
     echo "$(date): $1" >> /var/log/houer-install.log
 }
 
@@ -36,12 +39,13 @@ info() {
 }
 
 log "Starting HoUer OS post-installation configuration..."
+log "Installing HoUer OS specific components..."
 
-# Update system
-log "Updating system packages..."
-pacman -Syu --noconfirm
+# Update package database
+log "Updating package database..."
+pacman -Sy
 
-# Install Enlightenment DE
+# Install Enlightenment Desktop Environment (HoUer OS default DE)
 log "Installing Enlightenment Desktop Environment..."
 pacman -S --needed --noconfirm \
     enlightenment \
@@ -49,255 +53,155 @@ pacman -S --needed --noconfirm \
     efl \
     python-efl
 
-# Install container tools
+# Install container management tools (HoUer OS core feature)
 log "Installing container management tools..."
 pacman -S --needed --noconfirm \
     podman \
     distrobox \
-    docker \
-    docker-compose
+    flatpak
 
-# Install Python and essential development tools
-log "Installing Python and essential development tools..."
-pacman -S --needed --noconfirm \
-    python \
-    python-pip \
-    python-setuptools \
-    python-tk
-
-# Install flatpak
-log "Installing Flatpak..."
-pacman -S --needed --noconfirm flatpak
+# Add Flathub repository
+log "Adding Flathub repository..."
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-# Install essential GNOME applications
-log "Installing essential GNOME applications..."
+# Install Python for HoUer Manager
+log "Installing Python for HoUer Manager..."
 pacman -S --needed --noconfirm \
-    nautilus \
-    gedit \
-    gnome-calculator \
-    gnome-terminal \
-    gnome-system-monitor \
-    gnome-screenshot \
-    evince \
-    firefox
+    python \
+    python-tk
 
-# Install essential KDE applications
-log "Installing essential KDE applications..."
-pacman -S --needed --noconfirm \
-    konsole \
-    dolphin \
-    kate \
-    ark \
-    spectacle \
-    kcalc \
-    okular
-
-# Install input methods
-log "Installing input methods..."
+# Install Korean input method (for HoUer OS)
+log "Installing Korean input method..."
 pacman -S --needed --noconfirm \
     ibus \
-    ibus-hangul \
-    ibus-libpinyin \
-    ibus-anthy
+    ibus-hangul
 
-# Install graphics drivers
-log "Detecting graphics card..."
-if lspci | grep -i nvidia > /dev/null; then
-    warning "NVIDIA graphics card detected. Installing NVIDIA drivers..."
-    pacman -S --needed --noconfirm \
-        nvidia \
-        nvidia-utils \
-        lib32-nvidia-utils \
-        nvidia-settings
-fi
-
-if lspci | grep -i amd > /dev/null; then
-    info "AMD graphics card detected. Installing AMD drivers..."
-    pacman -S --needed --noconfirm \
-        xf86-video-amdgpu \
-        vulkan-radeon \
-        lib32-vulkan-radeon
-fi
-
-# Install Wayland and X11 support
-log "Installing display server support..."
+# Configure display server support
+log "Configuring display server support..."
 pacman -S --needed --noconfirm \
     wayland \
-    xwayland \
-    xorg-server \
-    xorg-xinit \
-    xorg-xrandr \
-    xorg-xsetroot
+    xwayland
 
 # Install audio system
 log "Installing audio system..."
 pacman -S --needed --noconfirm \
     pulseaudio \
     pulseaudio-alsa \
-    pavucontrol \
-    alsa-utils
+    pavucontrol
 
-# Install fonts
-log "Installing fonts..."
+# Install Korean fonts
+log "Installing Korean fonts..."
 pacman -S --needed --noconfirm \
-    ttf-dejavu \
-    ttf-liberation \
-    noto-fonts \
-    noto-fonts-cjk \
-    noto-fonts-emoji
+    noto-fonts-cjk
 
-# Install Wine for Windows application support
-log "Installing Wine..."
-pacman -S --needed --noconfirm \
-    wine \
-    winetricks \
-    lib32-gnutls
-
-# Install essential system tools
-log "Installing essential system tools..."
-pacman -S --needed --noconfirm \
-    base-devel \
-    git \
-    wget \
-    curl \
-    nano \
-    vim \
-    htop \
-    neofetch \
-    file-roller \
-    gvfs \
-    gvfs-mtp
-
-# Enable services
-log "Enabling system services..."
-systemctl enable NetworkManager
-systemctl enable bluetooth
-systemctl enable cups
-
-# Install AUR helper (yay) for regular user
-log "Installing AUR helper (yay)..."
-# Get the first regular user (not root)
-REGULAR_USER=$(getent passwd | awk -F: '$3 >= 1000 && $3 < 60000 { print $1; exit }')
-
-if [ -n "$REGULAR_USER" ]; then
-    log "Installing yay for user: $REGULAR_USER"
-    
-    # Switch to user and install yay
-    sudo -u "$REGULAR_USER" bash << 'EOFYAY'
-    cd /tmp
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si --noconfirm
-    cd ..
-    rm -rf yay
-EOFYAY
-
-    # Note: soda can be installed later if needed for Windows containers
-    log "Note: Install soda later if needed for Windows container support:"
-    info "  yay -S soda-git"
-else
-    warning "No regular user found, skipping AUR helper installation"
-fi
+# Enable essential services
+log "Enabling essential services..."
+systemctl enable NetworkManager || warning "NetworkManager already enabled or not found"
+systemctl enable bluetooth || warning "Bluetooth service not found"
 
 # Copy HoUer Manager
 log "Installing HoUer Manager..."
 if [ -d "/opt/houer-installer/Manager" ]; then
     cp -r /opt/houer-installer/Manager /opt/houer-manager
-    chown -R root:root /opt/houer-manager
     chmod +x /opt/houer-manager/houer-manager.py
-    chmod +x /opt/houer-manager/houer-manager
     
-    # Create command-line launcher
-    log "Creating HoUer Manager command..."
-    cp /opt/houer-manager/houer-manager /usr/local/bin/houer-manager
+    # Create system-wide command
+    cat > /usr/local/bin/houer-manager << 'EOF'
+#!/bin/bash
+cd /opt/houer-manager
+python3 houer-manager.py "$@"
+EOF
     chmod +x /usr/local/bin/houer-manager
     
-    # Alternative shorter command
+    # Create short command alias
     ln -sf /usr/local/bin/houer-manager /usr/local/bin/houer
     
-    # Create desktop entry for HoUer Manager
-    log "Creating desktop entry..."
-    tee /usr/share/applications/houer-manager.desktop > /dev/null <<EOF
+    # Create desktop entry
+    cat > /usr/share/applications/houer-manager.desktop << 'EOF'
 [Desktop Entry]
 Name=HoUer Manager
-GenericName=Container Manager
 Comment=Container Management for HoUer OS
 Exec=houer-manager
 Icon=/opt/houer-manager/assets/icon.png
 Terminal=false
 Type=Application
-Categories=System;Settings;
-StartupNotify=true
-Keywords=container;docker;podman;distrobox;virtualization;
+Categories=System;
 EOF
+    
+    log "HoUer Manager installed successfully"
 else
-    warning "HoUer Manager not found in installer directory"
+    warning "HoUer Manager source not found in /opt/houer-installer/Manager"
 fi
 
-# Replace system logos
-log "Installing HoUer OS logos..."
-if [ -f "/opt/houer-installer/LOGO.png" ]; then
-    cp /opt/houer-installer/LOGO.png /usr/share/pixmaps/houer-logo.png
-    # Note: Boot logos will be set during bootloader configuration
-fi
+# Configure Enlightenment as default session
+log "Configuring Enlightenment as default session..."
+# Get the first regular user
+REGULAR_USER=$(getent passwd | awk -F: '$3 >= 1000 && $3 < 60000 { print $1; exit }')
 
-# Configure Enlightenment as default
-log "Configuring Enlightenment as default desktop environment..."
 if [ -n "$REGULAR_USER" ]; then
-    echo "exec enlightenment_start" > /home/"$REGULAR_USER"/.xinitrc
-    chown "$REGULAR_USER:$REGULAR_USER" /home/"$REGULAR_USER"/.xinitrc
-fi
-
-# Configure Wayland session
-mkdir -p /usr/share/wayland-sessions
-tee /usr/share/wayland-sessions/enlightenment.desktop > /dev/null <<EOF
-[Desktop Entry]
-Name=Enlightenment
-Comment=The Enlightenment Desktop Environment
-Exec=enlightenment_start
-Type=Application
+    log "Configuring session for user: $REGULAR_USER"
+    USER_HOME=$(getent passwd "$REGULAR_USER" | cut -d: -f6)
+    
+    # Set up .xinitrc for X11 fallback
+    echo "exec enlightenment_start" > "$USER_HOME/.xinitrc"
+    chown "$REGULAR_USER:$REGULAR_USER" "$USER_HOME/.xinitrc"
+    
+    # Configure input method
+    cat > "$USER_HOME/.profile" << 'EOF'
+export GTK_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+export QT_IM_MODULE=ibus
+ibus-daemon -drx
 EOF
-
-# Set default session to Wayland for user
-if [ -n "$REGULAR_USER" ]; then
-    echo "export XDG_SESSION_TYPE=wayland" >> /home/"$REGULAR_USER"/.bashrc
-    echo "export GDK_BACKEND=wayland" >> /home/"$REGULAR_USER"/.bashrc
-    echo "export QT_QPA_PLATFORM=wayland" >> /home/"$REGULAR_USER"/.bashrc
-    chown "$REGULAR_USER:$REGULAR_USER" /home/"$REGULAR_USER"/.bashrc
+    chown "$REGULAR_USER:$REGULAR_USER" "$USER_HOME/.profile"
+else
+    warning "No regular user found for session configuration"
 fi
 
-# Set up display manager to use Wayland by default
-log "Configuring display manager..."
-if systemctl is-enabled gdm &>/dev/null; then
-    # Enable Wayland for GDM
-    sed -i 's/#WaylandEnable=false/WaylandEnable=true/' /etc/gdm/custom.conf
-elif systemctl is-enabled sddm &>/dev/null; then
-    # Configure SDDM for Wayland
-    mkdir -p /etc/sddm.conf.d
-    echo "[General]" > /etc/sddm.conf.d/wayland.conf
-    echo "DisplayServer=wayland" >> /etc/sddm.conf.d/wayland.conf
-fi
+# Configure HoUer OS branding
+log "Applying HoUer OS branding..."
+echo "HoUer OS" > /etc/os-release.d/NAME
+echo "Container-centric OS based on Arch Linux" > /etc/os-release.d/DESCRIPTION
 
-# Create welcome message
-log "Creating welcome message..."
-tee /etc/motd > /dev/null <<EOF
+# Create HoUer OS welcome message
+cat > /etc/motd << 'EOF'
 Welcome to HoUer OS!
 
-Container-centric operating system based on Arch Linux
+A container-centric operating system based on Arch Linux.
 
 Quick start:
-  houer-manager    - Start the container manager
-  houer           - Short command for container manager
+- Run 'houer-manager' or 'houer' to manage containers
+- Use 'distrobox' for Linux containers
+- Enlightenment is your desktop environment
 
 Documentation: https://github.com/your-repo/houer-os
-Support: https://github.com/your-repo/houer-os/issues
-
 EOF
 
-# Clean up
-log "Cleaning up..."
-rm -rf /opt/houer-installer
+# Final configuration
+log "Performing final configuration..."
+
+# Enable auto-login for the regular user (optional)
+if [ -n "$REGULAR_USER" ]; then
+    log "Setting up auto-login for $REGULAR_USER"
+    systemctl enable getty@tty1.service
+    
+    # Create override directory and file for auto-login
+    mkdir -p /etc/systemd/system/getty@tty1.service.d
+    cat > /etc/systemd/system/getty@tty1.service.d/override.conf << EOF
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --autologin $REGULAR_USER --noclear %I \$TERM
+EOF
+fi
+
+# Update font cache
+log "Updating font cache..."
+fc-cache -fv
 
 log "HoUer OS post-installation completed successfully!"
-log "System is ready for use. Please reboot to start using HoUer OS." 
+log "System is ready for use. Reboot to start HoUer OS."
+
+info "After reboot:"
+info "- Start Enlightenment desktop environment"
+info "- Run 'houer-manager' to manage containers"
+info "- Check /var/log/houer-install.log for installation details" 

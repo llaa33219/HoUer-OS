@@ -17,7 +17,7 @@ HoUer OS는 컨테이너 중심으로 동작하며 Enlightenment를 기본 DE로
 ### 전제 조건
 - 아치리눅스 라이브 환경 (USB 또는 CD/DVD 부팅)
 - 인터넷 연결
-- 충분한 디스크 공간 (최소 12GB, 권장 20GB)
+- 충분한 디스크 공간 (최소 8GB, 권장 16GB)
 
 ### 설치 방법
 
@@ -55,9 +55,9 @@ sudo ./installer/install.sh
    - `houer-manager` 명령어로 컨테이너 관리자 실행
 
 **📋 설치 과정 요약:**
-- **준비 스크립트**: 라이브 환경에서 설치 도구 준비
-- **Calamares**: 실제 OS 설치 (파티션, 부트로더 등)
-- **Post-install**: HoUer OS 전용 구성요소 설치
+- **준비 스크립트**: 라이브 환경에서 Calamares 설치 도구 준비
+- **Calamares**: 실제 OS 설치 (파티션, 부트로더, 기본 애플리케이션들)
+- **Post-install**: HoUer OS만의 특별한 구성요소 설치 (Enlightenment, 컨테이너 도구, HoUer Manager)
 
 ## HoUer Manager
 
@@ -133,39 +133,51 @@ python3 /opt/houer-manager/houer-manager.py
 ### 최소 사양
 - CPU: x86_64 아키텍처
 - RAM: 2GB (4GB 권장)
-- 저장공간: 12GB (컨테이너용 추가 공간 필요)
+- 저장공간: 8GB (컨테이너용 추가 공간 필요)
 - 그래픽: 통합 그래픽 또는 전용 그래픽카드
 
 ### 권장 사양
 - CPU: 멀티코어 프로세서
 - RAM: 8GB 이상
-- 저장공간: SSD 32GB 이상
+- 저장공간: SSD 20GB 이상
 - 그래픽: NVIDIA 또는 AMD 전용 그래픽카드
 
-**💡 균형잡힌 설치**: HoUer OS는 기본적인 데스크톱 환경과 필수 애플리케이션을 포함하면서도 공간 효율성을 고려합니다.
+**💡 효율적인 설치**: HoUer OS는 Calamares가 기본 데스크톱 애플리케이션을 설치하고, post-install에서 HoUer OS만의 특별한 구성요소를 추가합니다.
 
 ## 추가 패키지 설치
 
 HoUer OS는 기본적인 데스크톱 환경과 필수 애플리케이션을 포함합니다. 필요에 따라 추가 패키지를 설치할 수 있습니다:
 
-### 추가 개발 도구
+### AUR 헬퍼 설치 (추가 패키지용)
 ```bash
-# 고급 개발 도구들 (기본: Python, pip, base-devel은 이미 설치됨)
-sudo pacman -S nodejs npm rust cargo go code
-
-# 추가 Python 패키지들
-sudo pacman -S python-wheel python-virtualenv
+# yay 설치 (AUR 패키지 관리용)
+cd /tmp
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si --noconfirm
 ```
 
 ### Windows 컨테이너 지원 (soda)
 ```bash
-# yay는 이미 설치됨
+# yay 설치 후
 yay -S --noconfirm soda-git
+```
+
+### 추가 개발 도구
+```bash
+# 고급 개발 도구들 (기본 Python 개발 환경은 이미 설치됨)
+sudo pacman -S nodejs npm rust cargo go code
+
+# 컨테이너 도구들
+sudo pacman -S docker docker-compose
+
+# 추가 Python 도구들
+sudo pacman -S python-virtualenv
 ```
 
 ### 추가 멀티미디어 애플리케이션
 ```bash
-# 멀티미디어 (기본 애플리케이션들은 이미 설치됨)
+# 멀티미디어 (기본 Firefox, 파일 관리자 등은 이미 설치됨)
 sudo pacman -S vlc gimp inkscape audacity
 
 # 오피스
@@ -180,13 +192,19 @@ sudo pacman -S blender krita
 # 시스템 관리 (기본 도구들은 이미 설치됨)
 sudo pacman -S gparted wireshark-qt
 
-# 개발자 도구
-sudo pacman -S docker docker-compose
+# 네트워크 도구
+sudo pacman -S nmap tcpdump
 ```
 
 ### 추가 입력 방법
 ```bash
-# 베트남어 입력기 (한국어, 중국어, 일본어는 이미 설치됨)
+# 중국어 입력기 (한국어는 HoUer OS에서 기본 설치됨)
+sudo pacman -S ibus-libpinyin
+
+# 일본어 입력기
+sudo pacman -S ibus-anthy
+
+# 베트남어 입력기
 sudo pacman -S ibus-unikey
 ```
 
