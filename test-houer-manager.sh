@@ -1,7 +1,14 @@
 #!/bin/bash
 # Test script for HoUer Manager in development environment
+# WARNING: This does NOT test the actual installation process!
+# The installation should be done in an Arch Linux live environment.
 
-echo "Testing HoUer Manager..."
+echo "Testing HoUer Manager (Development Mode)..."
+echo ""
+echo "⚠️  WARNING: This is a development test only!"
+echo "   The actual HoUer OS installation must be done in an Arch Linux live environment."
+echo "   Do not run installer/install.sh in your current system!"
+echo ""
 
 # Check if we're in the right directory
 if [[ ! -f "Manager/houer-manager.py" ]]; then
